@@ -10,7 +10,7 @@ vortices, and the world answers to them: petals are wound up and carried along, 
 over, spray is torn off the sea, and the flowers you pass are left with fewer petals, the faster
 you went by.
 
-**Play it: <https://petalwake.non.io>** (a desktop browser with WebGL2; the first load is about 55 MB)
+**Play it: <https://petalwake.non.io>** (a desktop browser with WebGL2; the first load is about 48 MB)
 
 ![Sprinting over the meadow with petals wound into the wake](screenshots/meadow_wake.jpg)
 

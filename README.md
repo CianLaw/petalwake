@@ -1,3 +1,5 @@
+Warning: Complete slop. I haven't read a single line of this repo. -Jacob
+
 # Petalwake
 
 *A broom, an island, a good wind.*

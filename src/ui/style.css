@@ -1,0 +1,65 @@
+:root {
+  --ink: #fff8ec;
+  --petal: #ff9ec4;
+  --gold: #ffd36b;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; background: #0b1420; overflow: hidden; }
+body { font-family: "Karla", system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+#view { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; outline: none; }
+
+/* ---------- title ---------- */
+#title {
+  position: fixed; inset: 0; display: grid; place-items: center; text-align: center;
+  background: radial-gradient(120% 90% at 50% 40%, rgba(9, 22, 40, 0.05), rgba(6, 14, 28, 0.62));
+  transition: opacity 1.4s ease, visibility 1.4s; z-index: 5;
+}
+#title.loading { background: #0b1522; }
+#title.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+.title-inner { padding: 24px; transform: translateY(-4vh); }
+.kicker { margin: 0 0 10px; letter-spacing: 0.34em; text-transform: uppercase; font-size: 12px; opacity: 0.78; }
+h1 {
+  margin: 0; font-family: "Fraunces", Georgia, serif; font-weight: 340; font-style: italic;
+  font-size: clamp(64px, 11vw, 168px); line-height: 0.95; letter-spacing: -0.02em;
+  text-shadow: 0 2px 40px rgba(10, 30, 60, 0.45);
+}
+.bar { width: min(280px, 60vw); height: 2px; margin: 34px auto 12px; background: rgba(255, 255, 255, 0.18); overflow: hidden; border-radius: 2px; }
+.bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--petal), var(--gold)); transition: width 0.35s ease; }
+.status { margin: 0; font-size: 13px; letter-spacing: 0.08em; opacity: 0.7; min-height: 1.4em; }
+#start {
+  margin-top: 30px; padding: 15px 44px; font: 600 14px "Karla", sans-serif; letter-spacing: 0.3em; text-transform: uppercase;
+  color: #2a1730; background: linear-gradient(180deg, #fff3e2, #ffd9e6); border: 0; border-radius: 999px; cursor: pointer;
+  box-shadow: 0 10px 40px rgba(255, 150, 200, 0.35), inset 0 -2px 0 rgba(120, 40, 80, 0.18);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+#start:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 16px 50px rgba(255, 150, 200, 0.5), inset 0 -2px 0 rgba(120, 40, 80, 0.18); }
+.keys { margin-top: 34px; display: flex; gap: 10px 26px; flex-wrap: wrap; justify-content: center; font-size: 13px; opacity: 0.86; max-width: 760px; }
+kbd {
+  display: inline-block; min-width: 24px; padding: 3px 7px; margin-right: 4px; font: 600 11px "Karla", sans-serif; letter-spacing: 0.06em;
+  border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 6px; background: rgba(255, 255, 255, 0.10);
+}
+
+/* ---------- hud ---------- */
+#hud { position: fixed; inset: 0; pointer-events: none; z-index: 3; transition: opacity 0.6s ease; text-shadow: 0 1px 12px rgba(0, 20, 50, 0.55); }
+#hud.quiet { opacity: 0; }
+.hud-tl { position: absolute; left: 30px; top: 26px; }
+.seeds { display: flex; align-items: baseline; gap: 8px; font-family: "Fraunces", serif; font-size: 34px; font-style: italic; }
+.seeds-of { font-size: 16px; opacity: 0.7; font-style: normal; font-family: "Karla", sans-serif; }
+.seeds-icon { width: 15px; height: 15px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, var(--gold) 55%, #ff9f43); box-shadow: 0 0 16px var(--gold); align-self: center; }
+.place { margin-top: 6px; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0; transition: opacity 1.2s ease; }
+.place.show { opacity: 0.85; }
+.hud-bl { position: absolute; left: 30px; bottom: 28px; width: 190px; }
+.gust { height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.22); overflow: hidden; }
+.gust-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #fff, var(--petal)); border-radius: 4px; }
+.gust-label { margin-top: 7px; font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase; opacity: 0.7; }
+.hud-br { position: absolute; right: 32px; bottom: 22px; font-family: "Fraunces", serif; font-style: italic; font-size: 44px; line-height: 1; }
+.hud-br small { font: 500 11px "Karla", sans-serif; letter-spacing: 0.3em; text-transform: uppercase; margin-left: 8px; opacity: 0.7; }
+.toast {
+  position: absolute; left: 50%; top: 15%; transform: translateX(-50%); font-family: "Fraunces", serif; font-style: italic; font-size: clamp(22px, 2.6vw, 38px);
+  opacity: 0; transition: opacity 0.9s ease; white-space: nowrap;
+}
+.toast.show { opacity: 0.96; }
+
+.compass { display: inline-flex; align-items: center; gap: 6px; margin-left: 14px; font: 500 12px "Karla", sans-serif; letter-spacing: 0.12em; opacity: 0.8; font-style: normal; }
+.compass svg { color: var(--gold); filter: drop-shadow(0 0 6px rgba(255, 211, 107, 0.7)); transition: transform 0.12s linear; }

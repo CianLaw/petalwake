@@ -1,0 +1,16 @@
+# dependencies and local environments
+node_modules/
+tools/.venv/
+__pycache__/
+
+# Raw generation output: concept renders, Meshy meshes, full-size PBR sources (about 250 MB).
+# The game runs from the processed results in assets/; tools/gen and tools/blender made them.
+art/
+
+# local only
+.shots/
+.deploy/
+.claude/
+.env
+.env.*
+.DS_Store

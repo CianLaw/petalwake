@@ -1,0 +1,11 @@
+{
+ "name": "heather",
+ "height": 0.404,
+ "tris": 190,
+ "radius": 0.433,
+ "baseRadius": 0.26,
+ "slabs": [],
+ "thin": true,
+ "sway": 0.45,
+ "lod0": 45
+}

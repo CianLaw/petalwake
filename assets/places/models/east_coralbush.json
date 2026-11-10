@@ -1,0 +1,11 @@
+{
+ "name": "east_coralbush",
+ "height": 0.795,
+ "tris": 360,
+ "radius": 0.755,
+ "baseRadius": 0.136,
+ "slabs": [],
+ "sway": 0.15,
+ "lod0": 130,
+ "foliage": 0.4
+}

@@ -1,0 +1,11 @@
+{
+ "name": "cottongrass",
+ "height": 0.612,
+ "tris": 164,
+ "radius": 0.246,
+ "baseRadius": 0.054,
+ "slabs": [],
+ "thin": true,
+ "sway": 1.1,
+ "lod0": 45
+}

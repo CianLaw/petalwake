@@ -1,0 +1,11 @@
+{
+ "name": "east_plume",
+ "height": 2.956,
+ "tris": 434,
+ "radius": 1.084,
+ "baseRadius": 0.134,
+ "slabs": [],
+ "sway": 1.0,
+ "lod0": 120,
+ "thin": true
+}

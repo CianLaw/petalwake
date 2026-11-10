@@ -1,0 +1,17 @@
+{
+ "name": "east_shard",
+ "height": 1.01,
+ "tris": 93,
+ "radius": 0.569,
+ "baseRadius": 0.38,
+ "slabs": [],
+ "sway": 0.0,
+ "lod0": 140,
+ "glow": [
+  0.55,
+  0.85,
+  1.0,
+  1.6
+ ],
+ "foliage": 0.35
+}

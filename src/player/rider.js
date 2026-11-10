@@ -1,5 +1,9 @@
 // The rider: Meshy model with wind-driven secondary motion (cape, bristles, hat, swinging lantern),
 // lit by the sun + sky, casting a crisp shadow onto the world through its own small shadow map.
+//
+// Two poses beyond plain riding, both driven from outside (game/landing.js, game/tricks.js):
+//   seat - the seated model lifted, squashed or rolled about the broom (hops, the kickflip);
+//   off  - dismounted: a second model of her standing (rider_stand.glb, optional) takes its place.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { U } from '../core/ctx.js';
@@ -7,6 +11,7 @@ import { U } from '../core/ctx.js';
 const SCALE = 1.28;
 const SHADOW_SIZE = 1024;
 const SHADOW_EXTENT = 3.4; // half-width of the shadow box in metres
+const STAND_HEIGHT = 2.05; // boots to hat tip, if the standing model does not say how big it is
 
 export class Rider {
   static async load(renderer, base = './assets/models') {
@@ -32,6 +37,11 @@ export class Rider {
       uLantern: { value: new THREE.Vector2() },
     };
     this.lantern = { ax: 0, az: 0, vx: 0, vz: 0 };
+    // seated model: lift (m), squash (1 = none), roll about the broom (rad), calm (1 stills the hover bob)
+    this.seat = { hop: 0, sy: 1, flip: 0, calm: 0 };
+    // dismounted: show the standing model with its feet at y (m, in the rider's frame), squashed by sy
+    this.off = { on: false, y: 0, sy: 1 };
+    this.standing = null;                // { root, model, height } once the standing model is in
     this.meshes = [];
     model.traverse((o) => {
       if (!o.isMesh) return;
@@ -45,6 +55,7 @@ export class Rider {
       if (m.map) m.map.anisotropy = 8;
       this._patch(m, !!o.geometry.attributes._wind);
     });
+    this._outline = this._measure(model);
 
     // ---- lights for the sharp layer (three's units: irradiance, so pi x our radiance-style sun)
     this.sun = new THREE.DirectionalLight(0xffffff, 1);
@@ -71,8 +82,7 @@ export class Rider {
     this._m = new THREE.Matrix4();
   }
 
-  _patch(mat, hasWind) {
-    const u = this.uniforms;
+  _patch(mat, hasWind, u = this.uniforms) {
     mat.onBeforeCompile = (shader) => {
       Object.assign(shader.uniforms, u);
       if (!hasWind) return;
@@ -112,8 +122,84 @@ export class Rider {
     mat.needsUpdate = true;
   }
 
-  setEnvironment(tex) {
-    for (const m of this.meshes) { m.material.envMap = tex; m.material.needsUpdate = true; }
+  /** A thinned-out copy of the model's points (y, z in the rider's frame), for restHeight(). */
+  _measure(model) {
+    model.updateMatrixWorld(true);
+    const out = [], v = new THREE.Vector3();
+    model.traverse((o) => {
+      if (!o.isMesh) return;
+      const p = o.geometry.attributes.position;
+      const step = Math.max(1, Math.floor(p.count / 24000));
+      for (let i = 0; i < p.count; i += step) {
+        v.fromBufferAttribute(p, i).applyMatrix4(o.matrixWorld);
+        out.push(v.y, v.z);
+      }
+    });
+    return new Float32Array(out);
+  }
+
+  /**
+   * How high the middle of the broom is when it has been set down nose-up at `pitch` radians:
+   * the height that puts the lowest part of rider and broom (boots, bristles) on the floor.
+   */
+  restHeight(pitch) {
+    const c = Math.cos(pitch), s = Math.sin(pitch), a = this._outline;
+    let min = Infinity;
+    for (let i = 0; i < a.length; i += 2) { const y = a[i] * c - a[i + 1] * s; if (y < min) min = y; }
+    return -min;
+  }
+
+  /**
+   * The same character on her feet, for when she has landed. Optional: without it she stays on
+   * the broom and sets it down. Same conventions as rider.glb (one mesh, _wind weights, facing
+   * -z) except that the origin is on the floor between her boots.
+   */
+  async loadStand(base = './assets/models', name = 'rider_stand') {
+    const [gltf, info] = await Promise.all([
+      new GLTFLoader().loadAsync(`${base}/${name}.glb`),
+      fetch(`${base}/${name}.json`).then((r) => (r.ok ? r.json() : {})).catch(() => ({})),
+    ]);
+    return this.setStand(gltf.scene, info);
+  }
+
+  setStand(model, info = {}) {
+    if (this.standing) this.group.remove(this.standing.root);
+    const root = new THREE.Group();
+    // (rider_stand.json keeps the seated model's units, and its "scale" is a record of how it got them)
+    model.scale.setScalar(typeof info.scale === 'number' ? info.scale : SCALE);
+    model.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(model);
+    let height = box.max.y - box.min.y;
+    // a model that did not keep to the seated one's scale is brought to a sensible height
+    if (!(height > 1.3 && height < 2.9)) {
+      model.scale.multiplyScalar(STAND_HEIGHT / height);
+      model.updateMatrixWorld(true);
+      box.setFromObject(model);
+      height = box.max.y - box.min.y;
+    }
+    model.position.y -= box.min.y;        // boots on the floor, wherever the origin was left
+    root.add(model);
+    root.visible = false;
+    const u = {
+      uRiderTime: this.uniforms.uRiderTime,
+      uRiderWind: { value: 0.5 },
+      uLanternPivot: { value: new THREE.Vector3().fromArray(info.lanternPivot || [0, 1e3, 0]) },
+      uLantern: { value: new THREE.Vector2() },
+    };
+    model.traverse((o) => {
+      if (!o.isMesh) return;
+      o.frustumCulled = false;
+      o.castShadow = true;
+      o.receiveShadow = true;
+      const m = o.material;
+      m.envMapIntensity = 1.0;
+      m.normalScale?.set(1, 1);
+      if (m.map) m.map.anisotropy = 8;
+      this._patch(m, !!o.geometry.attributes._wind, u);
+    });
+    this.group.add(root);
+    this.standing = { root, model, height, uniforms: u };
+    return this.standing;
   }
 
   /** @param flight Flight state. */
@@ -124,11 +210,32 @@ export class Rider {
     g.rotation.set(flight.pitch, -flight.yaw, -flight.roll);
     // hover: a slow bob and a breath of sway, more nervous at speed
     const sk = Math.min(flight.speed / 33, 2);
-    this.tilt.position.y = Math.sin(time * 1.9) * 0.05 + Math.sin(time * 5.3) * 0.012 * sk;
-    this.tilt.rotation.z = Math.sin(time * 1.3) * 0.022 + Math.sin(time * 7.1) * 0.006 * sk;
+    const st = this.seat, live = 1 - st.calm;
+    this.tilt.position.y = (Math.sin(time * 1.9) * 0.05 + Math.sin(time * 5.3) * 0.012 * sk) * live + st.hop;
+    this.tilt.rotation.z = (Math.sin(time * 1.3) * 0.022 + Math.sin(time * 7.1) * 0.006 * sk) * live + st.flip;
     // (and a nod with the landing bounce: nose down as she sinks into it, up as she springs back)
-    this.tilt.rotation.x = Math.sin(time * 1.1 + 1) * 0.016 - flight.pitchRate * 0.05 + Math.max(-0.12, Math.min(0.12, flight.bobV * 0.035));
+    this.tilt.rotation.x = Math.sin(time * 1.1 + 1) * 0.016 * live - flight.pitchRate * 0.05 + Math.max(-0.12, Math.min(0.12, flight.bobV * 0.035));
     this.tilt.rotation.y = -flight.turnRate * 0.07;
+    // squash and stretch keep her volume: what she loses in height she gains in girth
+    const wide = st.sy === 1 ? 1 : 1 / Math.sqrt(st.sy);
+    this.tilt.scale.set(wide, st.sy, wide);
+
+    // on her feet: the standing model takes the seated one's place
+    const S = this.standing, o = this.off;
+    if (S) {
+      const on = o.on;
+      S.root.visible = on;
+      this.tilt.visible = !on;
+      if (on) {
+        // a little life while she waits: breathing, and a slow shift of her weight
+        const sy = o.sy * (1 + 0.006 * Math.sin(time * 1.7)), w = 1 / Math.sqrt(sy);
+        S.root.position.set(0, o.y, 0);
+        S.root.scale.set(w, sy, w);
+        S.root.rotation.set(Math.sin(time * 0.53 + 0.4) * 0.008, 0, Math.sin(time * 0.71) * 0.012);
+        S.uniforms.uRiderWind.value = 0.42 + 0.22 * Math.sin(time * 0.6) * Math.sin(time * 0.23 + 1.0);
+        S.uniforms.uLantern.value.set(Math.sin(time * 1.3) * 0.05, Math.sin(time * 1.1 + 0.7) * 0.04);
+      }
+    } else this.tilt.visible = true;
 
     this.uniforms.uRiderTime.value = time;
     this.uniforms.uRiderWind.value = 0.35 + 0.65 * sk + flight.boosting * 0.6;

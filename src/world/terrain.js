@@ -1,7 +1,7 @@
 // Terrain: baked heightfield + CDLOD quadtree mesh + the material that paints meadow, cliff, beach.
 import * as THREE from 'three';
 import { U, World, shared } from '../core/ctx.js';
-import { NOISE, NOISE_TEX, ATMOSPHERE, CLOUD_SHADOW, TERRAIN_LOOKUP, MEADOW, SHADOW, STRIP } from '../shaders/common.js';
+import { NOISE, NOISE_TEX, ATMOSPHERE, CLOUD_SHADOW, TERRAIN_LOOKUP, MEADOW, SHADOW, STRIP, TOWN_SHADOW, TOWN_MASK } from '../shaders/common.js';
 import { SKY_UNIFORMS } from './sky.js';
 
 // CDLOD. For seams to stay closed, level L may only begin morphing beyond the farthest point any
@@ -15,13 +15,13 @@ const MAX_NODES = 2600;
 
 // createImageBitmap decodes off the main thread and, unlike img.decode(), does not wait on the
 // page's rendering loop (which stalls in a hidden or throttled tab)
-async function loadImage(url) {
+export async function loadImage(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`${url}: ${res.status}`);
   return createImageBitmap(await res.blob(), { premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
 }
 
-function dataTex(img, { srgb = false, mips = true, aniso = 8, wrap = THREE.ClampToEdgeWrapping } = {}) {
+export function dataTex(img, { srgb = false, mips = true, aniso = 8, wrap = THREE.ClampToEdgeWrapping } = {}) {
   const t = new THREE.Texture(img);
   t.flipY = false;
   t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
@@ -43,7 +43,7 @@ function pixels(img, size) {
 }
 
 /** Stack material images into a texture array. */
-async function materialArrays(base) {
+export async function materialArrays(base) {
   const meta = await (await fetch(`${base}/materials.json`)).json();
   const S = meta.size;
   const L = meta.order.length;
@@ -270,7 +270,8 @@ export class Terrain {
 
     this.material = new THREE.ShaderMaterial({
       uniforms: {
-        ...shared(...SKY_UNIFORMS, 'uTime', 'uHeightTex', 'uSplatTex', 'uLightTex', 'uTintTex', 'uWorld', 'uNoiseTex', 'uShadowTex', 'uShadowMat', 'uShadowOn', 'uWakeTex', 'uWake', 'uStripTex'),
+        ...shared(...SKY_UNIFORMS, 'uTime', 'uHeightTex', 'uSplatTex', 'uLightTex', 'uTintTex', 'uWorld', 'uNoiseTex', 'uShadowTex', 'uShadowMat', 'uShadowOn', 'uWakeTex', 'uWake', 'uStripTex',
+          'uTownSh0', 'uTownSh1', 'uTownShM0', 'uTownShM1', 'uTownShP', 'uTownMask0', 'uTownMask1', 'uTownRect0', 'uTownRect1'),
         uGrid: { value: GRID },
         uLodRange: { value: LOD_RANGE },
         uLodAlt: { value: 0 },
@@ -401,7 +402,7 @@ varying vec3 vWorld;
 uniform float uTime;
 uniform sampler2DArray uMatC;
 uniform sampler2DArray uMatN;
-uniform vec3 uMean[6];
+uniform vec3 uMean[8];
 uniform vec2 uGrassFade;
 uniform float uClipY;      // 1 in the water-reflection pass: drop everything below sea level
 uniform sampler2D uTintTex;
@@ -413,7 +414,7 @@ ${TERRAIN_LOOKUP}
 ${MEADOW}
 ${STRIP}
 
-const float L_CLIFF = 0.0, L_ROCK = 1.0, L_SCREE = 2.0, L_GROUND = 3.0, L_SAND = 4.0, L_PEB = 5.0;
+const float L_CLIFF = 0.0, L_ROCK = 1.0, L_SCREE = 2.0, L_GROUND = 3.0, L_SAND = 4.0, L_PEB = 5.0, L_COBBLE = 6.0, L_FLAG = 7.0;
 
 struct Mat { vec3 c; float h; vec2 n; float r; };
 Mat samp(float layer, vec2 uv, vec2 dx, vec2 dy){
@@ -465,6 +466,8 @@ float hblend(float mask, float hUnder, float hOver, float sharp){
   return saturate((mask * (1.0 + sharp) - (1.0 - hOver) * sharp * (0.5 + 0.5 * hUnder)) );
 }
 ${SHADOW}
+${TOWN_SHADOW}
+${TOWN_MASK}
 
 void main(){
   vec3 P = vWorld;
@@ -523,6 +526,9 @@ void main(){
   float tintAmt = flowers * dapple * mix(0.44, mix(0.50, 0.88, glance * glance), 1.0 - nearK) * mix(0.55 + 0.9 * speck, 1.0, smoothstep(40.0, 260.0, dist));
   // where the wake has torn the petals off there is no flower colour left, only the green
   tintAmt *= 1.0 - strippedFiltered(uv);
+  // in a town: streets and squares are paved, and nothing flowers where people walk
+  vec4 town = townMask(P.xz);
+  tintAmt *= 1.0 - town.a;
   vec3 fcol = texture(uTintTex, uv).rgb;
   meadow = mix(meadow, fcol, saturate(tintAmt));
   Mat m; m.c = meadow; m.h = mg.h; m.n = mg.n * 0.6 * nearK; m.r = 0.92;
@@ -635,13 +641,33 @@ void main(){
     Nw = normalize(mix(Nw, rn, rockAmt));
   }
 
+  // ---- towns: cobbled streets, flagged squares and quays, trodden earth round the houses
+  float paved = 0.0;
+  float pave = max(town.r, max(town.g, town.b));
+  if (pave > 0.004){
+    Mat mc = sampS(L_COBBLE, P.xz / 2.8, dPx.xz / 2.8, dPy.xz / 2.8);
+    Mat mf = sampS(L_FLAG, P.xz / 3.6, dPx.xz / 3.6, dPy.xz / 3.6);
+    Mat mp = mixMat(mc, mf, saturate(town.g / max(town.r + town.g, 1e-3)));
+    // bare earth: the cobble's grit without its colour
+    float earth = saturate(town.b / max(pave, 1e-3));
+    mp.c = mix(mp.c * vec3(0.86, 0.82, 0.76), vec3(0.36, 0.295, 0.205) * (0.72 + 0.5 * mc.h) * (0.85 + 0.3 * nzB.r), earth);
+    mp.n *= mix(1.0, 0.45, earth);
+    mp.r = mix(mp.r, 0.95, earth);
+    // its edge frays into the grass along the gaps between the stones
+    paved = hblend(saturate(pave * 1.25 + (nzC.r - 0.5) * 0.35 * (1.0 - pave)), m.h, mp.h, 0.9) * (1.0 - rockAmt * 0.8);
+    m.c = mix(m.c, mp.c, paved);
+    m.r = mix(m.r, mix(0.82, 0.95, mp.r), paved);
+    m.h = mix(m.h, mp.h, paved);
+    Nw = normalize(mix(Nw, normalize(N + vec3(mp.n.x, 0.0, mp.n.y) * 0.85), paved));
+  }
+
   // ---- light
   float cs = cloudShadow(P.xz, uTime);
-  float sh = shadowBaked * cs * riderShadow(P);
-  float soft = (1.0 - rockAmt) * (1.0 - lowW);                       // grass scatters light around the terminator
+  float sh = shadowBaked * cs * riderShadow(P) * townShadow(P, N);
+  float soft = (1.0 - rockAmt) * (1.0 - lowW) * (1.0 - paved);       // grass scatters light around the terminator
   float ndlRaw = dot(Nw, uSunDir);
   float dif = saturate((ndlRaw + 0.32 * soft) / (1.0 + 0.32 * soft));
-  float cav = mix(1.0, 0.55 + 0.45 * m.h, 0.7 * max(rockAmt, lowW)); // crevice darkening from the height map
+  float cav = mix(1.0, 0.55 + 0.45 * m.h, 0.7 * max(max(rockAmt, lowW), paved)); // crevice darkening from the height map
   // walls in shade are filled by the sky and by light off the sea and the rock opposite
   vec3 amb = mix(uAmbGround, uAmbSky, Nw.y * 0.5 + 0.5) * mix(ao, 0.35 + 0.65 * ao, rockAmt) * cav * (1.0 + 0.45 * rockAmt);
   // sunlit ground throws warm light back up into shaded walls

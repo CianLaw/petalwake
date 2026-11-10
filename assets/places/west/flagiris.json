@@ -1,0 +1,11 @@
+{
+ "name": "flagiris",
+ "height": 1.015,
+ "tris": 148,
+ "radius": 0.221,
+ "baseRadius": 0.033,
+ "slabs": [],
+ "thin": true,
+ "sway": 0.7,
+ "lod0": 45
+}

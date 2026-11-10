@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Karla:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./src/ui/style.css">
+<link rel="stylesheet" href="./src/ui/journal.css">
 <script type="importmap">
 { "imports": { "three": "./vendor/three/build/three.module.js", "three/addons/": "./vendor/three/examples/jsm/" } }
 </script>
@@ -25,8 +26,16 @@
   <div class="hud-bl">
     <div class="gust"><div class="gust-fill" id="gustFill"></div></div>
     <div class="gust-label">gust</div>
+    <div class="trick" id="trick" hidden><kbd>Q</kbd>kickflip</div>
   </div>
   <div class="hud-br"><span id="speed">0</span><small>km/h</small></div>
+  <div class="hud-tr" id="job" hidden>
+    <div class="job-kicker"><span class="job-icon"></span>parcel for</div>
+    <div class="job-name"><span id="jobName"></span><span class="job-spot" id="jobSpot"></span></div>
+    <div class="job-meta"><span class="compass" id="jobCompass" title="where the parcel is going"><svg viewBox="-12 -12 24 24" width="22" height="22"><path d="M0 -9 L5 6 L0 3 L-5 6 Z" fill="currentColor"/></svg><span id="jobDist"></span></span><span class="job-count"><span id="jobCount">0</span> delivered</span></div>
+  </div>
+  <div class="prompt" id="prompt"></div>
+  <div class="card" id="card"><div class="card-kicker" id="cardKicker"></div><div class="card-name" id="cardName"></div><div class="card-sub" id="cardSub"></div></div>
   <div class="toast" id="toast"></div>
 </div>
 
@@ -43,7 +52,7 @@
       <div><kbd>Shift</kbd> ride the gust</div>
       <div><kbd>Space</kbd> ease up</div>
       <div><kbd>Mouse</kbd> steer · <kbd>C</kbd> camera · <kbd>I</kbd> invert pitch</div>
-      <div><kbd>P</kbd> hide HUD · <kbd>M</kbd> mute</div>
+      <div><kbd>P</kbd> hide HUD · <kbd>M</kbd> mute · <kbd>J</kbd> journal</div>
     </div>
   </div>
 </div>

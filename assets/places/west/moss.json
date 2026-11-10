@@ -1,0 +1,11 @@
+{
+ "name": "moss",
+ "height": 0.231,
+ "tris": 96,
+ "radius": 0.6,
+ "baseRadius": 0.532,
+ "slabs": [],
+ "thin": false,
+ "sway": 0.0,
+ "lod0": 55
+}

@@ -1,0 +1,11 @@
+{
+ "name": "wisteria_fall",
+ "height": 0.056,
+ "tris": 18,
+ "radius": 0.528,
+ "baseRadius": 0.278,
+ "slabs": [],
+ "thin": true,
+ "sway": 0.0,
+ "lod0": 45
+}

@@ -1,0 +1,13 @@
+{
+ "name": "rimlily",
+ "height": 0.452,
+ "tris": 280,
+ "radius": 2.324,
+ "baseRadius": 2.096,
+ "slabs": [],
+ "thin": true,
+ "sway": 0.25,
+ "lod0": 90,
+ "foliage": 0.35,
+ "collide": false
+}

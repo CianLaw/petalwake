@@ -1,0 +1,11 @@
+{
+ "name": "gentian",
+ "height": 0.19,
+ "tris": 196,
+ "radius": 0.299,
+ "baseRadius": 0.191,
+ "slabs": [],
+ "thin": true,
+ "sway": 0.6,
+ "lod0": 45
+}

@@ -1,0 +1,15 @@
+{
+ "name": "east_songbone",
+ "height": 0.9,
+ "tris": 2082,
+ "slabs": [],
+ "radius": 0.398,
+ "baseRadius": 0.293,
+ "bounds": [
+  -0.322,
+  -0.178,
+  0.395,
+  0.159
+ ],
+ "collide": false
+}

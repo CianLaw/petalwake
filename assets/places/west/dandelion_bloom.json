@@ -1,0 +1,12 @@
+{
+ "name": "dandelion_bloom",
+ "height": 2.279,
+ "tris": 447,
+ "radius": 1.215,
+ "baseRadius": 1.014,
+ "slabs": [],
+ "thin": true,
+ "sway": 0.3,
+ "foliage": 0.9,
+ "lod0": 120
+}

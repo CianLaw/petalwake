@@ -1,0 +1,16 @@
+{
+ "larkhaven": {
+  "file": "larkhaven_mask.png",
+  "x0": -201,
+  "z0": 810,
+  "w": 332.8,
+  "h": 408.8
+ },
+ "cairnwick": {
+  "file": "cairnwick_mask.png",
+  "x0": 90,
+  "z0": -1280,
+  "w": 180.8,
+  "h": 218.0
+ }
+}

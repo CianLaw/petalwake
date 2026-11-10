@@ -1,0 +1,11 @@
+{
+ "name": "east_seaholly",
+ "height": 0.774,
+ "tris": 332,
+ "radius": 0.343,
+ "baseRadius": 0.223,
+ "slabs": [],
+ "sway": 0.55,
+ "lod0": 100,
+ "thin": true
+}

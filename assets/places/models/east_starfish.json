@@ -1,0 +1,12 @@
+{
+ "name": "east_starfish",
+ "height": 0.082,
+ "tris": 25,
+ "radius": 0.24,
+ "baseRadius": 0.24,
+ "slabs": [],
+ "sway": 0.0,
+ "lod0": 80,
+ "foliage": 0.0,
+ "thin": true
+}

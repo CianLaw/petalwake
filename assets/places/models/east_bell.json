@@ -1,0 +1,21 @@
+{
+ "name": "east_bell",
+ "height": 1.15,
+ "tris": 2596,
+ "slabs": [],
+ "radius": 0.209,
+ "baseRadius": 0.071,
+ "bounds": [
+  -0.187,
+  -0.163,
+  0.185,
+  0.209
+ ],
+ "collide": false,
+ "cloth": [
+  0.4,
+  0.07
+ ],
+ "foliage": 0,
+ "clothShare": 0.034
+}

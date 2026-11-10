@@ -1,0 +1,11 @@
+{
+ "name": "east_scorchgrass",
+ "height": 0.954,
+ "tris": 91,
+ "radius": 0.837,
+ "baseRadius": 0.072,
+ "slabs": [],
+ "sway": 1.0,
+ "lod0": 110,
+ "thin": true
+}

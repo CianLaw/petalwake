@@ -1,0 +1,17 @@
+{
+ "name": "east_cinder",
+ "height": 0.542,
+ "tris": 62,
+ "radius": 0.383,
+ "baseRadius": 0.227,
+ "slabs": [],
+ "sway": 0.0,
+ "lod0": 120,
+ "glow": [
+  0.55,
+  0.85,
+  1.0,
+  1.5
+ ],
+ "foliage": 0.0
+}

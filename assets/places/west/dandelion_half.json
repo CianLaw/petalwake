@@ -1,0 +1,12 @@
+{
+ "name": "dandelion_half",
+ "height": 2.875,
+ "tris": 612,
+ "radius": 1.288,
+ "baseRadius": 1.05,
+ "slabs": [],
+ "thin": true,
+ "sway": 0.3,
+ "foliage": 0.9,
+ "lod0": 120
+}

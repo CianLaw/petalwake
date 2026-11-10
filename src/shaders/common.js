@@ -237,6 +237,90 @@ float riderShadow(vec3 P){
 }
 `;
 
+/**
+ * The towns' shadows: one sun-space depth map per town, drawn once at load (world/town.js).
+ * x, y of uTownShP: 0 off / 1 standard depth / 2 reversed; z, w: metres of depth each map spans.
+ */
+const TOWN_SHADOW_UNIFORMS = /* glsl */`
+uniform sampler2D uTownSh0;
+uniform sampler2D uTownSh1;
+uniform mat4 uTownShM0;
+uniform mat4 uTownShM1;
+uniform vec4 uTownShP;
+`;
+export const TOWN_SHADOW = /* glsl */`
+${TOWN_SHADOW_UNIFORMS}
+float townSh1(sampler2D tex, mat4 M, float on, float range, vec3 P, vec3 N){
+  if (on < 0.5) return 1.0;
+  vec3 s = (M * vec4(P + N * 0.07, 1.0)).xyz;
+  if (s.x <= 0.0 || s.x >= 1.0 || s.y <= 0.0 || s.y >= 1.0 || s.z >= 1.0 || s.z <= 0.0) return 1.0;
+  float bias = 0.10 / range;
+  vec2 texel = 1.0 / vec2(textureSize(tex, 0));
+  float rot = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715)))) * 6.2831853;
+  float acc = 0.0;
+  for (int i = 0; i < 6; i++){
+    float fi = float(i);
+    float r = sqrt((fi + 0.5) / 6.0) * 1.7;
+    float a = fi * 2.3999632 + rot;
+    float d = texture(tex, s.xy + vec2(cos(a), sin(a)) * r * texel).r;
+    if (on > 1.5) d = 1.0 - d;
+    acc += step(s.z - bias, d);
+  }
+  float edge = smoothstep(0.0, 0.02, min(min(s.x, 1.0 - s.x), min(s.y, 1.0 - s.y)));
+  return mix(1.0, acc / 6.0, edge);
+}
+// 1 in the sun, 0 in a building's shadow. N = the surface normal (keeps a wall out of its own shadow).
+float townShadow(vec3 P, vec3 N){
+  return townSh1(uTownSh0, uTownShM0, uTownShP.x, uTownShP.z, P, N) * townSh1(uTownSh1, uTownShM1, uTownShP.y, uTownShP.w, P, N);
+}
+`;
+/** The same for vertex shaders (grass blades): one tap, no dithering. */
+export const TOWN_SHADOW_V = /* glsl */`
+${TOWN_SHADOW_UNIFORMS}
+float townShV1(sampler2D tex, mat4 M, float on, float range, vec3 P){
+  if (on < 0.5) return 1.0;
+  vec3 s = (M * vec4(P, 1.0)).xyz;
+  if (s.x <= 0.0 || s.x >= 1.0 || s.y <= 0.0 || s.y >= 1.0 || s.z >= 1.0 || s.z <= 0.0) return 1.0;
+  float d = textureLod(tex, s.xy, 0.0).r;
+  if (on > 1.5) d = 1.0 - d;
+  return step(s.z - 0.25 / range, d);
+}
+float townShadowV(vec3 P){
+  return townShV1(uTownSh0, uTownShM0, uTownShP.x, uTownShP.z, P) * townShV1(uTownSh1, uTownShM1, uTownShP.y, uTownShP.w, P);
+}
+`;
+
+/**
+ * The towns' ground: r cobbles, g flagstones, b bare earth, a nothing grows here.
+ * One mask per town (tools/town/fit_terrain.py); uTownRect = x0, z0, 1/width, 1/depth (0 = none).
+ */
+const TOWN_MASK_UNIFORMS = /* glsl */`
+uniform sampler2D uTownMask0;
+uniform sampler2D uTownMask1;
+uniform vec4 uTownRect0;
+uniform vec4 uTownRect1;
+`;
+export const TOWN_MASK = /* glsl */`
+${TOWN_MASK_UNIFORMS}
+vec4 townMask(vec2 xz){
+  vec2 a = (xz - uTownRect0.xy) * uTownRect0.zw;
+  if (uTownRect0.z > 0.0 && a.x > 0.0 && a.x < 1.0 && a.y > 0.0 && a.y < 1.0) return texture(uTownMask0, a);
+  vec2 b = (xz - uTownRect1.xy) * uTownRect1.zw;
+  if (uTownRect1.z > 0.0 && b.x > 0.0 && b.x < 1.0 && b.y > 0.0 && b.y < 1.0) return texture(uTownMask1, b);
+  return vec4(0.0);
+}
+`;
+export const TOWN_MASK_V = /* glsl */`
+${TOWN_MASK_UNIFORMS}
+vec4 townMaskV(vec2 xz){
+  vec2 a = (xz - uTownRect0.xy) * uTownRect0.zw;
+  if (uTownRect0.z > 0.0 && a.x > 0.0 && a.x < 1.0 && a.y > 0.0 && a.y < 1.0) return textureLod(uTownMask0, a, 0.0);
+  vec2 b = (xz - uTownRect1.xy) * uTownRect1.zw;
+  if (uTownRect1.z > 0.0 && b.x > 0.0 && b.x < 1.0 && b.y > 0.0 && b.y < 1.0) return textureLod(uTownMask1, b, 0.0);
+  return vec4(0.0);
+}
+`;
+
 export const TONEMAP = /* glsl */`
 // ACES fitted (Stephen Hill), tuned for a bright saturated look
 vec3 RRTAndODTFit(vec3 v){ vec3 a = v * (v + 0.0245786) - 0.000090537; vec3 b = v * (0.983729 * v + 0.4329510) + 0.238081; return a / b; }

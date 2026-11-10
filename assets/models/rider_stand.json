@@ -1,0 +1,158 @@
+{
+ "name": "rider_stand",
+ "units": "model units of rider.glb (the game draws the rider at SCALE 1.28)",
+ "up": [
+  0,
+  1,
+  0
+ ],
+ "forward": [
+  0,
+  0,
+  -1
+ ],
+ "origin": "on the floor, midway between the boots",
+ "height": 1.6087,
+ "bounds": {
+  "min": [
+   -0.5282,
+   0.0,
+   -0.2473
+  ],
+  "max": [
+   0.3001,
+   1.6087,
+   0.3167
+  ]
+ },
+ "tris": 74473,
+ "broomHand": "left",
+ "hand": [
+  -0.3794,
+  0.9315,
+  -0.0411
+ ],
+ "handSpanY": [
+  0.8831,
+  0.9862
+ ],
+ "broomTop": [
+  -0.4004,
+  1.535,
+  -0.0736
+ ],
+ "broomBase": [
+  -0.3671,
+  0.0,
+  -0.0217
+ ],
+ "broomAxis": [
+  -0.0217,
+  0.9992,
+  -0.0338
+ ],
+ "broomLength": 1.5363,
+ "handleRadius": 0.0226,
+ "bristleTopY": 0.4404,
+ "lanternPivot": [
+  -0.4201,
+  1.3778,
+  -0.0768
+ ],
+ "lanternCenter": [
+  -0.4571,
+  1.2286,
+  -0.0947
+ ],
+ "lanternBottomY": 1.1616,
+ "hatTip": [
+  -0.0075,
+  1.6087,
+  0.1886
+ ],
+ "hatBandCenter": [
+  -0.0,
+  1.4105,
+  0.0611
+ ],
+ "hatAxis": [
+  -0.0204,
+  0.8905,
+  0.4544
+ ],
+ "hatBrimRadius": 0.3029,
+ "faceCenter": [
+  -0.0075,
+  1.259,
+  -0.0399
+ ],
+ "feet": {
+  "right": [
+   0.116,
+   0.0,
+   -0.0001
+  ],
+  "left": [
+   -0.116,
+   0.0,
+   0.0001
+  ]
+ },
+ "wind": {
+  "attribute": "_WIND",
+  "channels": [
+   "cape",
+   "bristles",
+   "hat",
+   "lantern"
+  ],
+  "note": "same layout and shader as rider.glb; the straw tips on the floor and the handle carry no weight"
+ },
+ "scale": {
+  "factor": 0.84667,
+  "seatedOverStandingRaw": {
+   "hatBrimRadius": 0.8636,
+   "hatBandRadius": 0.8599,
+   "faceWidth": 0.8139,
+   "bandToChin": 0.8492
+  },
+  "standingOverSeatedAfterScaling": {
+   "hatBrimRadius": 0.9804,
+   "hatBandRadius": 0.9846,
+   "faceWidth": 1.0403,
+   "bandToChin": 0.997
+  },
+  "otherStandingOverSeated": {
+   "capeWidth": 1.1445,
+   "capeWidthFreeArmSideTwice": 1.1004,
+   "broomLength": 0.8105,
+   "bristleHeadLength": 0.8075,
+   "bristleHeadDiameter": 0.8891
+  }
+ },
+ "seated": {
+  "file": "rider.glb",
+  "boundsY": [
+   -0.4434,
+   0.8819
+  ],
+  "broomLength": 1.8954,
+  "bristleHeadLength": 0.4834,
+  "bristleHeadDiameter": 0.3469,
+  "hatBrimRadius": 0.309,
+  "hatBandRadius": 0.1269,
+  "faceWidth": 0.2323,
+  "hatBandCenter": [
+   -0.0058,
+   0.6733,
+   -0.2612
+  ],
+  "hatTip": [
+   -0.013,
+   0.8819,
+   -0.1347
+  ]
+ },
+ "bytes": 7904644,
+ "webpQuality": 88
+}

@@ -1,0 +1,11 @@
+{
+ "name": "fern",
+ "height": 1.119,
+ "tris": 432,
+ "radius": 1.294,
+ "baseRadius": 0.014,
+ "slabs": [],
+ "thin": true,
+ "sway": 0.55,
+ "foliage": 0.7
+}

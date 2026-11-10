@@ -1,0 +1,11 @@
+{
+ "name": "east_skybell",
+ "height": 0.46,
+ "tris": 224,
+ "radius": 0.308,
+ "baseRadius": 0.086,
+ "slabs": [],
+ "sway": 0.7,
+ "lod0": 80,
+ "thin": true
+}

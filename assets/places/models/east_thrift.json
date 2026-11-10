@@ -1,0 +1,11 @@
+{
+ "name": "east_thrift",
+ "height": 0.49,
+ "tris": 254,
+ "radius": 0.338,
+ "baseRadius": 0.223,
+ "slabs": [],
+ "sway": 0.8,
+ "lod0": 90,
+ "thin": true
+}

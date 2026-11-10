@@ -1,0 +1,11 @@
+{
+ "name": "spiderlily",
+ "height": 0.731,
+ "tris": 172,
+ "radius": 0.279,
+ "baseRadius": 0.01,
+ "slabs": [],
+ "thin": true,
+ "sway": 0.8,
+ "lod0": 45
+}

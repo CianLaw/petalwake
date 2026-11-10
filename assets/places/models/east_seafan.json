@@ -1,0 +1,12 @@
+{
+ "name": "east_seafan",
+ "height": 0.938,
+ "tris": 142,
+ "radius": 0.475,
+ "baseRadius": 0.045,
+ "slabs": [],
+ "sway": 0.5,
+ "lod0": 130,
+ "foliage": 0.8,
+ "thin": true
+}

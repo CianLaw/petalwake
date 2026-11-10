@@ -5,10 +5,11 @@
 // drops out or jumps. Everything leans with the wind's gust fronts and with the wake vortices.
 import * as THREE from 'three';
 import { U, World, shared } from '../core/ctx.js';
-import { NOISE, NOISE_TEX, ATMOSPHERE, CLOUD_SHADOW, TERRAIN_LOOKUP, MEADOW, WIND, SHADOW, STRIP } from '../shaders/common.js';
+import { NOISE, NOISE_TEX, ATMOSPHERE, CLOUD_SHADOW, TERRAIN_LOOKUP, MEADOW, WIND, SHADOW, STRIP, TOWN_SHADOW_V, TOWN_MASK_V } from '../shaders/common.js';
 import { SKY_UNIFORMS } from './sky.js';
 
-const SHARED = [...SKY_UNIFORMS, 'uTime', 'uHeightTex', 'uSplatTex', 'uLightTex', 'uWorld', 'uNoiseTex', 'uWakeTex', 'uWake', 'uWind', 'uShadowTex', 'uShadowMat', 'uShadowOn', 'uRider', 'uStripTex'];
+const SHARED = [...SKY_UNIFORMS, 'uTime', 'uHeightTex', 'uSplatTex', 'uLightTex', 'uWorld', 'uNoiseTex', 'uWakeTex', 'uWake', 'uWind', 'uShadowTex', 'uShadowMat', 'uShadowOn', 'uRider', 'uStripTex',
+  'uTownSh0', 'uTownSh1', 'uTownShM0', 'uTownShM1', 'uTownShP', 'uTownMask0', 'uTownMask1', 'uTownRect0', 'uTownRect1'];
 
 // ----------------------------------------------------------------------------------------
 // shell definitions. fade = [in0, in1, out0, out1] (metres from camera)
@@ -121,6 +122,8 @@ ${TERRAIN_LOOKUP}
 ${WIND}
 ${MEADOW}
 ${PLACE}
+${TOWN_SHADOW_V}
+${TOWN_MASK_V}
 uniform vec3 uCamPos;
 varying vec3 vWorld;
 varying vec3 vNormal;
@@ -136,6 +139,9 @@ void main(){
   vec4 splat = textureLod(uSplatTex, uv, 0.0);
   vec4 light = textureLod(uLightTex, uv, 0.0);
   vec3 root = vec3(xz.x, y, xz.y);
+  // in a town nothing grows on the paving, and the houses' shadows fall on what does grow
+  splat.a *= 1.0 - smoothstep(0.08, 0.5, townMaskV(xz).a);
+  light.r *= townShadowV(root + vec3(0.0, 0.35, 0.0));
   float d = distance(root, uCamPos);
   float cover = splat.a;
   // ragged edges: blades thin out before the sward ends
@@ -253,6 +259,8 @@ ${TERRAIN_LOOKUP}
 ${WIND}
 ${MEADOW}
 ${PLACE}
+${TOWN_SHADOW_V}
+${TOWN_MASK_V}
 ${STRIP}
 uniform vec3 uCamPos;
 uniform vec3 uSunDir;
@@ -272,6 +280,9 @@ void main(){
   vec4 splat = textureLod(uSplatTex, uv, 0.0);
   vec4 light = textureLod(uLightTex, uv, 0.0);
   vec3 root = vec3(xz.x, y, xz.y);
+  // in a town nothing grows on the paving, and the houses' shadows fall on what does grow
+  splat.a *= 1.0 - smoothstep(0.08, 0.5, townMaskV(xz).a);
+  light.r *= townShadowV(root + vec3(0.0, 0.35, 0.0));
   float d = distance(root, uCamPos);
   // flowers gather in drifts: denser splat -> more of the candidates bloom
   vec4 r2 = hash42(xz * 3.7 + 1.9);

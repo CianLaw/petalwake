@@ -1,0 +1,11 @@
+{
+ "name": "marigold",
+ "height": 0.496,
+ "tris": 154,
+ "radius": 0.272,
+ "baseRadius": 0.049,
+ "slabs": [],
+ "thin": true,
+ "sway": 0.6,
+ "lod0": 45
+}

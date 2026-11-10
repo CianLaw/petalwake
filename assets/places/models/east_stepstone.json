@@ -1,0 +1,11 @@
+{
+ "name": "east_stepstone",
+ "height": 0.15,
+ "tris": 32,
+ "radius": 0.672,
+ "baseRadius": 0.626,
+ "slabs": [],
+ "sway": 0.0,
+ "foliage": 0.0,
+ "collide": false
+}

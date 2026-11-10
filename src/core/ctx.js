@@ -35,6 +35,17 @@ export const U = {
   uShadowTex: { value: null },
   uShadowMat: { value: new THREE.Matrix4() },
   uShadowOn: { value: 0 },
+  // the towns' static shadow maps (world/town.js)
+  uTownSh0: { value: null },
+  uTownSh1: { value: null },
+  uTownShM0: { value: new THREE.Matrix4() },
+  uTownShM1: { value: new THREE.Matrix4() },
+  uTownShP: { value: new THREE.Vector4(0, 0, 1, 1) },
+  // the towns' ground masks (paving, bare earth, where nothing grows)
+  uTownMask0: { value: null },
+  uTownMask1: { value: null },
+  uTownRect0: { value: new THREE.Vector4(0, 0, 0, 0) },
+  uTownRect1: { value: new THREE.Vector4(0, 0, 0, 0) },
 
   // detail noise + material textures
   uNoiseTex: { value: null },

@@ -1,0 +1,23 @@
+{
+ "name": "east_splinter",
+ "height": 1.1,
+ "tris": 2085,
+ "slabs": [],
+ "radius": 0.443,
+ "baseRadius": 0.161,
+ "bounds": [
+  -0.385,
+  -0.371,
+  0.166,
+  0.141
+ ],
+ "collide": false,
+ "foliage": 0,
+ "glow": [
+  0.6,
+  0.9,
+  1.0,
+  3.0
+ ],
+ "glowShare": 0.354
+}

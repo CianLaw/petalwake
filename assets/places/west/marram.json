@@ -1,0 +1,11 @@
+{
+ "name": "marram",
+ "height": 0.727,
+ "tris": 144,
+ "radius": 0.573,
+ "baseRadius": 0.032,
+ "slabs": [],
+ "thin": true,
+ "sway": 1.0,
+ "lod0": 50
+}

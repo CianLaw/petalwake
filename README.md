@@ -10,7 +10,14 @@ vortices, and the world answers to them: petals are wound up and carried along, 
 over, spray is torn off the sea, and the flowers you pass are left with fewer petals, the faster
 you went by.
 
-**Play it: <https://petalwake.non.io>** (a desktop browser with WebGL2; the first load is about 48 MB)
+The island has people on it. Larkhaven is a harbour town of about a hundred hand-modelled
+buildings on the south shore; Cairnwick is a village on the northern cliffs; farms, mills and a
+beacon stand out in the meadows. A quarter of the buildings have somewhere high to set down: a
+tower gallery, a roof terrace, a lighthouse walk. Land there to deliver the parcel you are
+carrying and pick up the next.
+
+**Play it: <https://petalwake.non.io/v2>** (a desktop browser with WebGL2; the first load is about 95 MB).
+The first version, from before the towns, is still at <https://petalwake.non.io>.
 
 ![Sprinting over the meadow with petals wound into the wake](screenshots/meadow_wake.jpg)
 
@@ -23,6 +30,21 @@ you went by.
   <img src="screenshots/stone_circle.jpg" width="49%" alt="Standing stones in the meadow">
 </p>
 
+![Larkhaven from the sea](screenshots/larkhaven_harbour.jpg)
+
+<p>
+  <img src="screenshots/larkhaven_square.jpg" width="49%" alt="The market square in Larkhaven">
+  <img src="screenshots/larkhaven_above.jpg" width="49%" alt="The square, the walled orchard and the Crown on its hill">
+  <img src="screenshots/landing_approach.jpg" width="49%" alt="Coming in to land on the Star-gazer's Tower, its gallery lit up">
+  <img src="screenshots/landing_landed.jpg" width="49%" alt="Landed on the Couriers' Guild, over the market square">
+  <img src="screenshots/delivery_beacon.jpg" width="49%" alt="A gold light over the tower the parcel is for">
+  <img src="screenshots/kickflip.jpg" width="49%" alt="A kickflip along the quay">
+  <img src="screenshots/cairnwick.jpg" width="49%" alt="Cairnwick, the village on the northern cliffs">
+  <img src="screenshots/farmstead.jpg" width="49%" alt="A farm and its orchard out in the meadows">
+  <img src="screenshots/place_kettle_pools.jpg" width="49%" alt="The Kettle Pools, one of twelve hidden places">
+  <img src="screenshots/shore_crabs.jpg" width="49%" alt="Crabs on the south beach">
+</p>
+
 ## Controls
 
 | | |
@@ -31,6 +53,9 @@ you went by.
 | <kbd>A</kbd> <kbd>D</kbd> or <kbd>←</kbd> <kbd>→</kbd> | bank |
 | <kbd>Shift</kbd> | ride the gust (boost) |
 | <kbd>Space</kbd> | ease up (brake) |
+| <kbd>Space</kbd> <kbd>Space</kbd> | land, when a landing place lights up near you; <kbd>Space</kbd> again to take off |
+| <kbd>Q</kbd> | kickflip, once you have caught ten wind seeds |
+| <kbd>J</kbd> | the journal of treasures found |
 | Mouse | click the view to steer with it; left button boosts, right button brakes |
 | <kbd>C</kbd> | camera: chase, low, far |
 | <kbd>I</kbd> | invert pitch |
@@ -41,6 +66,12 @@ you went by.
 There is no way to fail. A dive rounds itself out and lands with a bounce, walls push you off, and
 the wind turns you home if you wander too far out to sea. Glowing wind seeds are scattered along
 the island's best lines; catching one tops up the gust.
+
+There is always one parcel to deliver. A gold light stands over the tower it is for, and the
+compass points the way: sometimes a hop across town, sometimes a flight to the other end of the
+island. Twelve odd places are hidden around the coast and the hills, each with its own plants and
+a treasure to find; the journal keeps hints for the ones you have not found. Down on the shore,
+the rocks are crusted with barnacles and the crabs run for it when you come by.
 
 ## Run it locally
 
@@ -84,6 +115,18 @@ shaders for nearly all of it.
 - **Sea, river, sky** ([src/world/water.js](src/world/water.js),
   [src/world/river.js](src/world/river.js), [src/world/clouds.js](src/world/clouds.js)). Gerstner
   swell with shore surf and reflections; ray-marched clouds baked into a sky texture at load.
+- **The towns** ([src/world/town.js](src/world/town.js), [tools/town](tools/town)). Every building
+  is a short Python script that models it in Blender with a small kit of parts (walls with real
+  openings, stepped-course roofs, galleries, chimneys, signs): see
+  [tools/town/README.md](tools/town/README.md). A layout script seats them along hand-drawn
+  streets, the terrain is cut and filled to suit (the quay, the harbour basin, the moles), and the
+  lot is packed into quantised chunks with three levels of detail, a baked sun shadow map per
+  town, and a height grid for collisions.
+- **Errands** ([src/game](src/game)). Landing places, the approach and the dismount, deliveries,
+  and the kickflip.
+- **Hidden places and shore life** ([src/world/places.js](src/world/places.js),
+  [src/world/shore.js](src/world/shore.js)). Twelve dressed sites with a treasure each; barnacles,
+  weed and crabs along the coast.
 - **Flight and camera** ([src/player/flight.js](src/player/flight.js),
   [src/player/camera.js](src/player/camera.js)). An arcade model tuned for skimming; the chase
   camera closes in when you slow down and pulls back when you sprint.
@@ -97,8 +140,10 @@ shaders for nearly all of it.
 index.html          the page, the title screen and the HUD
 src/                the game
   core/             shared uniforms, the frame pipeline
-  world/            terrain, meadow, water, river, sky, clouds, props, seeds
+  world/            terrain, meadow, water, river, sky, clouds, props, seeds, towns, places, shore
   player/           flight model, camera, input, the rider
+  game/             landing, deliveries, the kickflip
+  ui/               the journal
   fx/               wake vortices, wake maps, particles, wind effects
   shaders/          GLSL shared by every material
   audio/            procedural sound
@@ -107,6 +152,9 @@ vendor/three/       three.js r187, copied unmodified from the npm package
 tools/
   serve.py          dev server (no caching, optional frame capture)
   terrain/bake.py   builds everything in assets/terrain
+  town/             the building kit, one script per building, layout, terrain fitting, packing
+  shore/            builds the little kit of shells, weed, boulders and crabs
+  places/           lays out the hidden places
   gen/              concept art, models and materials from fal and Meshy
   blender/          turns generated meshes into game assets
 screenshots/
@@ -125,9 +173,31 @@ tools/.venv/bin/python tools/terrain/bake.py 4096 --keep-props
 A bake takes a little over a minute. `--keep-props` keeps trees, stones and boulders where they
 are; leave it off to scatter them afresh.
 
+## Rebuilding the towns
+
+Buildings and street furniture are modelled by the scripts in `tools/town/buildings` and
+`tools/town/props`, run inside Blender (5.2):
+
+```bash
+/Applications/Blender.app/Contents/MacOS/Blender -b -P tools/town/make.py -- h_inn --render --blend
+```
+
+That writes the mesh the game uses to `art/town/build`, a preview picture and a `.blend` file to
+open. `tools/town/layout.py` says where everything stands. After changing either:
+
+```bash
+tools/town/build.sh
+```
+
+plans the lots, fits the ground and packs `assets/town`. `MODELS=1 tools/town/build.sh` runs every
+building script through Blender first (a few minutes), which a fresh clone needs once since
+`art/` is not in the repository. Fitting the ground always starts from the untouched island bake,
+kept in `art/terrain_base`; on a fresh clone, bake the island first (above) so that the copy it
+takes is a clean one.
+
 ## Regenerating the art
 
-The rider and the props were generated, not modelled by hand: concept images from fal
+The rider, the trees and stones, and the pieces of the hidden places were generated, not modelled by hand: concept images from fal
 (`nano-banana-pro`), meshes from Meshy (`meshy-7.1`, image to 3D), ground and rock materials from
 fal (`patina`), then cleaned up, weighted for wind and exported with the Blender scripts. The
 scripts in `tools/gen` read `FAL_KEY` and `MESHY_API_KEY` from the environment. Their raw output
@@ -147,5 +217,7 @@ Petalwake is released under the MIT License: see [LICENSE](LICENSE).
 
 Petalwake was built in a day with [Claude Code](https://claude.com/claude-code) (Claude Fable 5.2)
 from a short brief and a reference clip for the mood, then tuned over a few rounds of play-testing
-notes. The code, the shaders, the terrain bake and the asset pipeline were written by the model;
-the art was generated with the services credited above.
+notes. The towns, the deliveries, the hidden places and the shore life were added the next day,
+with the buildings modelled by a handful of helper agents working two at a time. The code, the
+shaders, the terrain bake and the asset pipeline were written by the model; the art was generated
+with the services credited above, apart from the buildings, which are modelled in code.

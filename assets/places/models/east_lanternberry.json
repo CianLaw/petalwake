@@ -1,0 +1,17 @@
+{
+ "name": "east_lanternberry",
+ "height": 0.6,
+ "tris": 300,
+ "radius": 0.685,
+ "baseRadius": 0.016,
+ "slabs": [],
+ "sway": 0.8,
+ "lod0": 100,
+ "glow": [
+  1.0,
+  0.62,
+  0.22,
+  0.9
+ ],
+ "thin": true
+}

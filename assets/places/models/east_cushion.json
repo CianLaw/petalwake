@@ -1,0 +1,11 @@
+{
+ "name": "east_cushion",
+ "height": 0.283,
+ "tris": 185,
+ "radius": 0.579,
+ "baseRadius": 0.519,
+ "slabs": [],
+ "sway": 0.25,
+ "lod0": 90,
+ "thin": true
+}

@@ -1,0 +1,11 @@
+{
+ "name": "east_anemone",
+ "height": 0.569,
+ "tris": 326,
+ "radius": 0.242,
+ "baseRadius": 0.1,
+ "slabs": [],
+ "sway": 1.0,
+ "lod0": 100,
+ "thin": true
+}

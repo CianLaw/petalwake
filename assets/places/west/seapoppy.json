@@ -1,0 +1,11 @@
+{
+ "name": "seapoppy",
+ "height": 0.389,
+ "tris": 156,
+ "radius": 0.36,
+ "baseRadius": 0.053,
+ "slabs": [],
+ "thin": true,
+ "sway": 0.6,
+ "lod0": 45
+}

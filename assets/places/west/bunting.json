@@ -1,0 +1,16 @@
+{
+ "name": "bunting",
+ "height": 14.2,
+ "tris": 277,
+ "radius": 11.6,
+ "baseRadius": 0.3,
+ "slabs": [],
+ "thin": true,
+ "sway": 0.8,
+ "cloth": [
+  0.72,
+  0.2
+ ],
+ "foliage": 0.45,
+ "collide": false
+}

@@ -1,0 +1,32 @@
+{
+ "name": "pennant_white",
+ "height": 9.6,
+ "tris": 282,
+ "radius": 0.5,
+ "baseRadius": 0.2,
+ "slabs": [
+  [
+   0,
+   0,
+   0.16,
+   0.0,
+   9.6
+  ]
+ ],
+ "thin": true,
+ "sway": 0.5,
+ "cloth": [
+  8.2,
+  0.62
+ ],
+ "foliage": 0.45,
+ "solid": [
+  [
+   0,
+   0,
+   0.16,
+   0.0,
+   9.6
+  ]
+ ]
+}

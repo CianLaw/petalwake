@@ -1,0 +1,22 @@
+{
+ "name": "east_ferrylight",
+ "height": 0.95,
+ "tris": 2535,
+ "slabs": [],
+ "radius": 0.323,
+ "baseRadius": 0.3,
+ "bounds": [
+  -0.277,
+  -0.281,
+  0.273,
+  0.261
+ ],
+ "collide": false,
+ "glowKey": "amber",
+ "glow": [
+  1.0,
+  0.72,
+  0.36,
+  4.5
+ ]
+}

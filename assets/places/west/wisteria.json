@@ -1,0 +1,13 @@
+{
+ "name": "wisteria",
+ "height": 0.05,
+ "tris": 540,
+ "radius": 0.6,
+ "baseRadius": 0.6,
+ "slabs": [],
+ "thin": true,
+ "sway": 1.6,
+ "foliage": 0.3,
+ "collide": false,
+ "hang": 1.576
+}

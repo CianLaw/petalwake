@@ -1,0 +1,11 @@
+{
+ "name": "east_lotus",
+ "height": 1.808,
+ "tris": 130,
+ "radius": 0.856,
+ "baseRadius": 0.022,
+ "slabs": [],
+ "sway": 0.6,
+ "lod0": 110,
+ "thin": true
+}

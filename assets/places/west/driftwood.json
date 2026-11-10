@@ -1,0 +1,19 @@
+{
+ "name": "driftwood",
+ "height": 0.98,
+ "tris": 156,
+ "radius": 1.805,
+ "baseRadius": 1.304,
+ "slabs": [
+  [
+   0,
+   0,
+   0.9,
+   0.0,
+   0.3
+  ]
+ ],
+ "thin": false,
+ "sway": 0.0,
+ "collide": false
+}

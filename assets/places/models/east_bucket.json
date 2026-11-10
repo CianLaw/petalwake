@@ -1,0 +1,11 @@
+{
+ "name": "east_bucket",
+ "height": 0.725,
+ "tris": 328,
+ "radius": 0.702,
+ "baseRadius": 0.27,
+ "slabs": [],
+ "sway": 0.0,
+ "foliage": 0.0,
+ "collide": false
+}

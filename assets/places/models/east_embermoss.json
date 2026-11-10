@@ -1,0 +1,10 @@
+{
+ "name": "east_embermoss",
+ "height": 0.221,
+ "tris": 384,
+ "radius": 0.583,
+ "baseRadius": 0.51,
+ "slabs": [],
+ "sway": 0.2,
+ "lod0": 90
+}

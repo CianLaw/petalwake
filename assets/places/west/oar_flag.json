@@ -1,0 +1,24 @@
+{
+ "name": "oar_flag",
+ "height": 4.4,
+ "tris": 118,
+ "radius": 0.4,
+ "baseRadius": 0.1,
+ "slabs": [
+  [
+   0.15,
+   -0.06,
+   0.12,
+   0.0,
+   4.4
+  ]
+ ],
+ "thin": true,
+ "sway": 0.4,
+ "cloth": [
+  2.7,
+  0.34
+ ],
+ "foliage": 0.45,
+ "collide": false
+}

@@ -1,0 +1,12 @@
+{
+ "name": "dandelion_clock",
+ "height": 2.934,
+ "tris": 884,
+ "radius": 1.273,
+ "baseRadius": 1.065,
+ "slabs": [],
+ "thin": true,
+ "sway": 0.3,
+ "foliage": 0.9,
+ "lod0": 120
+}

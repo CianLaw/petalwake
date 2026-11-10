@@ -1,0 +1,17 @@
+{
+ "name": "east_glasslily",
+ "height": 1.303,
+ "tris": 169,
+ "radius": 0.48,
+ "baseRadius": 0.023,
+ "slabs": [],
+ "sway": 0.8,
+ "lod0": 110,
+ "glow": [
+  0.62,
+  0.9,
+  1.0,
+  1.2
+ ],
+ "thin": true
+}

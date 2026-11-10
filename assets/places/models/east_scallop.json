@@ -1,0 +1,12 @@
+{
+ "name": "east_scallop",
+ "height": 0.154,
+ "tris": 20,
+ "radius": 0.223,
+ "baseRadius": 0.223,
+ "slabs": [],
+ "sway": 0.0,
+ "lod0": 80,
+ "foliage": 0.0,
+ "thin": true
+}

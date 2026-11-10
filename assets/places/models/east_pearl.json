@@ -1,0 +1,17 @@
+{
+ "name": "east_pearl",
+ "height": 0.68,
+ "tris": 224,
+ "radius": 0.335,
+ "baseRadius": 0.219,
+ "slabs": [],
+ "sway": 0.0,
+ "foliage": 0.0,
+ "collide": false,
+ "glow": [
+  0.95,
+  0.9,
+  1.0,
+  1.1
+ ]
+}

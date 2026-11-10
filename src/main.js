@@ -18,7 +18,10 @@ import { WindFX } from './fx/windfx.js';
 import { Seeds } from './world/seeds.js';
 import { River } from './world/river.js';
 import { Props } from './world/props.js';
+import { Town } from './world/town.js';
+import { Places } from './world/places.js';
 import { Sound } from './audio/audio.js';
+import { Gameplay } from './game/index.js';
 
 const $ = (id) => document.getElementById(id);
 const canvas = $('view');
@@ -85,10 +88,15 @@ async function boot() {
   U.uWakeTex.value = blank;
   U.uStripTex.value = blank;
   U.uShadowTex.value = blank;
+  U.uTownSh0.value = blank;
+  U.uTownSh1.value = blank;
+  U.uTownMask0.value = blank;
+  U.uTownMask1.value = blank;
 
   setLoad(0.08, 'raising the island…');
   const riderLoad = Rider.load(renderer);
   const propsLoad = Props.load();
+  const townLoad = Town.load(renderer);
   const terrain = (game.terrain = await Terrain.load(renderer));
   terrain.mainView.mesh.renderOrder = 500;
   world.add(terrain.mainView.mesh);
@@ -119,6 +127,14 @@ async function boot() {
   const props = (game.props = await propsLoad);
   world.add(props.group);
   if (props.overlay) pipeline.overlay.add(props.overlay);
+  // the towns: buildings, their landing pads, and what the broom bumps into
+  const town = (game.town = await townLoad);
+  world.add(town.group);
+  town.bakeShadows();
+  // hidden places and their treasures (their models load later, as the rider comes near)
+  const places = (game.places = await Places.load(renderer, terrain));
+  world.add(places.group);
+  pipeline.overlay.add(places.overlay);
 
   setLoad(0.9, 'waking the broom…');
   const rider = (game.rider = await riderLoad);
@@ -132,6 +148,10 @@ async function boot() {
   fx.vortex = vortex;
   fx.strip = game.strip;
   pipeline.overlay.add(fx.group);
+  // the shore: tide lines, what clings to the rocks, and the crabs. Decoration only, so it is loaded
+  // on its own: if the module or its assets fail, the game goes on without it.
+  const shore = (game.shore = await import('./world/shore.js').then((m) => m.Shore.load(renderer, terrain)).catch((e) => (console.error(e), null)));
+  if (shore) world.add(shore.attach({ camera, fx, water, town, overlay: pipeline.overlay }).group);
   const seeds = (game.seeds = new Seeds(terrain, terrain.meta));
   pipeline.overlay.add(seeds.group);
   $('seedTotal').textContent = seeds.total;
@@ -141,11 +161,13 @@ async function boot() {
   const flight = (game.flight = new Flight(terrain));
   flight.river = river;
   flight.props = props;
+  places.bind(game);                         // journal, pickups, and the broom bumps into their pieces too
   fx.river = river;
-  flight.place(260, -860, 9, 262);
+  { const c = titleCircuit(); flight.place(c.x - c.r, c.z, c.agl, 0); }
   game.chase = new ChaseCamera(camera, flight);
   game.chase.mode = 2;                       // the title screen watches from further back
   game.chase.dist = 14; game.chase.height = 4.2;
+  game.gameplay = new Gameplay(game);        // landing pads, deliveries, the kickflip (asleep until game.town exists)
 
   resize();
   setLoad(1);
@@ -166,6 +188,7 @@ function start() {
   game.state = 'play';
   game.input.enabled = true;
   game.chase.mode = 0;
+  game.chase.orbit = 0;                      // (the title's sidelong view swings round behind her)
   game.sound.start();
   $('title').classList.add('gone');
   $('hud').hidden = false;
@@ -208,14 +231,21 @@ function frame(now) {
   render(dt);
 }
 
+/** Where the title screen's broom circles: round the main town when there is one. */
+function titleCircuit() {
+  const t = (game.terrain.meta.towns || []).find((q) => q.id === 'larkhaven');
+  return t && game.town && game.town.towns.length ? { x: t.x, z: t.z + 30, r: 235, agl: 30 } : { x: 120, z: -820, r: 420, agl: 9 };
+}
+
 /** Title screen: the broom flies itself in a lazy circuit over the meadows. */
 const pilot = { turn: 0, pitch: 0, boost: false, brake: false };
 function autopilot() {
   const f = game.flight, t = game.time;
-  const wantAgl = 7 + 5 * Math.sin(t * 0.21);
+  const wantAgl = titleCircuit().agl * (1 + 0.3 * Math.sin(t * 0.21));
   pilot.pitch = THREE.MathUtils.clamp((wantAgl - f.agl) * 0.09 - f.pitch * 1.6, -1, 1);
-  // circle a point on the north plateau, breathing in and out
-  const cx = 120, cz = -820, R = 360 + 120 * Math.sin(t * 0.13);
+  // circle the harbour town (or, with no town, a point on the north plateau), breathing in and out
+  const c = titleCircuit();
+  const cx = c.x, cz = c.z, R = c.r * (1 + 0.22 * Math.sin(t * 0.13));
   const dx = f.pos.x - cx, dz = f.pos.z - cz;
   const r = Math.hypot(dx, dz) || 1;
   // clockwise tangent (seen from above), corrected toward the ring
@@ -225,6 +255,8 @@ function autopilot() {
   let d = Math.atan2(wx, -wz) - f.yaw;
   d = Math.atan2(Math.sin(d), Math.cos(d));
   pilot.turn = THREE.MathUtils.clamp(d * 1.3, -0.7, 0.7);
+  // the camera rides on her outside shoulder and looks in across her, so the town is the backdrop
+  if (c.r < 300) game.chase.orbit = 1.78 + 0.16 * Math.sin(t * 0.09);
   return pilot;
 }
 
@@ -233,6 +265,7 @@ const _sp = [0, 0, 0, 0];
 function advance(dt, ctl) {
   const t = game.time;
   const { flight, rider, chase, terrain, wake, fx, vortex } = game;
+  game.gameplay.update(dt, ctl);             // may take the broom over (flight.auto) to land it
   flight.update(dt, ctl, t);
   rider.update(dt, t, flight, terrain);
   if (flight.touchdown > 0) fx.slam(flight, flight.touchdown, rider.sunVis);
@@ -275,6 +308,9 @@ function advance(dt, ctl) {
     else if (n === 1) toast('a wind seed — there are more out there');
     else if (n % 6 === 0) toast(`${total - n} seeds still adrift`);
   }
+  game.places.update(dt, flight, t);
+  game.town.ambient(dt, fx, camera);
+  game.shore?.update(dt, flight, t);
   U.uRider.value.set(flight.pos.x, flight.pos.y, flight.pos.z, flight.speed);
   U.uRiderVel.value.copy(flight.vel);
   pipeline.params.speed = THREE.MathUtils.clamp((flight.speed - 30) / 45, 0, 1);
@@ -308,6 +344,7 @@ function render(dt) {
   game.water.renderReflection(camera, pipeline.size);
   game.terrain.select(game.terrain.mainView, camera);
   game.meadow.update(camera);
+  game.town.update(dt, U.uTime.value, camera);
   game.water.update(camera);
   renderer.info.reset();
   pipeline.render(world, camera, dt);
@@ -341,6 +378,8 @@ function shoreNear(dt) {
 function placeName() {
   const p = game.flight.pos, m = game.terrain.meta, T = game.terrain;
   const ground = T.heightAt(p.x, p.z);
+  const town = game.town.nameAt(p.x, p.z);
+  if (town) return town;
   if (Math.hypot(p.x - m.peak[0], p.z - m.peak[2]) < 240 && p.y > m.peak[1] - 110) return "Wren's Crown";
   for (let i = 0; i < m.fjord.length - 1; i++) {
     const a = m.fjord[i], b = m.fjord[i + 1];
